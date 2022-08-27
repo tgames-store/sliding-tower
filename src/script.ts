@@ -343,6 +343,9 @@ class Game {
 
     startGame() {
         if ( this.state != this.STATES.PLAYING ) {
+            // give message to our class
+            tgames.gameStarted();
+
             this.scoreContainer.innerHTML = '0';
             this.updateState(this.STATES.PLAYING);
             this.addBlock();
@@ -351,6 +354,9 @@ class Game {
 
     restartGame() {
         this.updateState(this.STATES.RESETTING);
+
+        // give message to our class
+        tgames.gameStarted();
 
         let oldBlocks = this.placedBlocks.children;
         let removeSpeed = 0.2;
@@ -431,7 +437,9 @@ class Game {
     endGame() {
         let gameScore = {value: this.blocks.length - 1};
 
+        // Show our Ad when game over
         tgames.gameOver( gameScore );
+        // Tell our class that game is over
         tgames.showRewardedAd();
 
         this.updateState(this.STATES.ENDED);
