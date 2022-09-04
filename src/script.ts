@@ -2,7 +2,6 @@ import './style.scss'
 // @ts-ignore
 import * as THREE from 'three'
 import { TweenLite, Power1 } from "gsap";
-import { tgames } from "./tgames";
 console.clear();
 
 interface BlockReturn {
@@ -29,8 +28,6 @@ type TPositionParams = {
     ease: any;
     onComplete: () => any;
 }
-
-
 
 class Stage {
     private container: any;
@@ -276,11 +273,9 @@ class Game {
     mainContainer: any;
     startButton: any;
     instructions: any;
-    private tgames: typeof tgames;
 
     constructor() {
         this.stage = new Stage();
-        this.tgames = tgames;
 
         this.mainContainer = document.getElementById('container');
         this.scoreContainer = document.getElementById('score');
@@ -344,6 +339,7 @@ class Game {
     startGame() {
         if ( this.state != this.STATES.PLAYING ) {
             // give message to our class
+            // @ts-ignore
             tgames.gameStarted();
 
             this.scoreContainer.innerHTML = '0';
@@ -356,6 +352,7 @@ class Game {
         this.updateState(this.STATES.RESETTING);
 
         // give message to our class
+        // @ts-ignore
         tgames.gameStarted();
 
         let oldBlocks = this.placedBlocks.children;
@@ -435,11 +432,13 @@ class Game {
     }
 
     endGame() {
-        let gameScore = {value: this.blocks.length - 1};
+        let gameScore = { value: this.blocks.length - 2 };
 
         // Show our Ad when game over
-        tgames.gameOver( gameScore );
+        // @ts-ignore
+        tgames.gameOver( gameScore.value );
         // Tell our class that game is over
+        // @ts-ignore
         tgames.showRewardedAd();
 
         this.updateState(this.STATES.ENDED);

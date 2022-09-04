@@ -3,7 +3,14 @@
   <component name="ChangeListManager">
     <list default="true" id="9c191844-c065-43ae-a599-3bf42aceb255" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/bundle.c1db7376e8927bff.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/bundle.c1db7376e8927bff.js.LICENSE.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/bundle.c1db7376e8927bff.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/dist/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/include.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/script.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/script.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tgames.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/tgames.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,7 +54,11 @@
       <workItem from="1661341465444" duration="1669000" />
       <workItem from="1661360976648" duration="1627000" />
       <workItem from="1661367292786" duration="130000" />
-      <workItem from="1661616241886" duration="1328000" />
+      <workItem from="1661616241886" duration="2560000" />
+      <workItem from="1661710414269" duration="215000" />
+      <workItem from="1661782919798" duration="330000" />
+      <workItem from="1661804429050" duration="2579000" />
+      <workItem from="1662197188437" duration="4958000" />
     </task>
     <servers />
   </component>
