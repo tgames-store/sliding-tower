@@ -122,14 +122,15 @@ class Block {
 
     workingPlane: 'x' | 'y' | 'z';
     workingDimension?: string;
+    newliveWidth?: boolean;
 
     targetBlock: Block;
 
-    constructor(block:Block)
-    {
+    constructor(block:Block, newliveWidth = false) {
         // set size and position
 
         this.targetBlock = block;
+        this.newliveWidth = newliveWidth;
 
         this.index = (this.targetBlock ? this.targetBlock.index : 0) + 1;
         this.workingPlane = this.index % 2 ? 'x' : 'z';
@@ -139,6 +140,11 @@ class Block {
         this.dimension.width = this.targetBlock ? this.targetBlock.dimension.width : 10;
         this.dimension.height = this.targetBlock ? this.targetBlock.dimension.height : 2;
         this.dimension.depth = this.targetBlock ? this.targetBlock.dimension.depth : 10;
+
+        if (newliveWidth) {
+            this.dimension.width = 5;
+            this.dimension.depth = 5;
+        }
 
         this.position.x = this.targetBlock ? this.targetBlock.position.x : 0;
         this.position.y = this.dimension.height * this.index;
@@ -158,7 +164,7 @@ class Block {
         }
 
         // state
-        this.state = this.index > 1 ? this.STATES.ACTIVE : this.STATES.STOPPED;
+        this.state = this.index > 1 && !newliveWidth ? this.STATES.ACTIVE : this.STATES.STOPPED;
 
         // set direction
         this.speed = -0.1 - ( this.index * 0.01 );
@@ -201,7 +207,11 @@ class Block {
             this.dimension.depth = this.targetBlock.dimension.depth;
         }
 
-        if ( overlap > 0 ) {
+        if (this.newliveWidth) {
+            overlap = 5
+        }
+
+        if ( overlap > 0) {
             let choppedDimensions: TDimension = { width: this.dimension.width, height: this.dimension.height, depth: this.dimension.depth };
             choppedDimensions[this.workingDimension] -= overlap;
             this.dimension[this.workingDimension] = overlap;
@@ -254,6 +264,7 @@ class Game {
     STATES: TStates = {
         'LOADING': 'loading',
         'PLAYING': 'playing',
+        'CONTINUE': 'continue',
         'READY': 'ready',
         'ENDED': 'ended',
         'RESETTING': 'resetting'
@@ -273,6 +284,11 @@ class Game {
     mainContainer: any;
     startButton: any;
     instructions: any;
+    skip: any;
+    adsWatch: any;
+    spareLife: boolean;
+    adsCounter: any;
+    adsTimeout: any;
 
     constructor() {
         this.stage = new Stage();
@@ -282,6 +298,8 @@ class Game {
         this.startButton = document.getElementById('start-button');
         this.instructions = document.getElementById('instructions');
         this.scoreContainer.innerHTML = '0';
+        this.spareLife = true;
+        this.adsCounter = 3;
 
         this.newBlocks = new THREE.Group();
         this.placedBlocks = new THREE.Group();
@@ -302,6 +320,26 @@ class Game {
 
         document.addEventListener('click', e => {
             this.onAction();
+        });
+
+        document.querySelector('.game-watch-ads').addEventListener('click', (e) => {
+            e.stopPropagation();
+        })
+
+        document.getElementById('skip-button').addEventListener('click', (e) => {
+            e.stopPropagation();
+            clearTimeout(this.adsTimeout);
+            this.handleSkipWatchAds();
+            this.endGame();
+        });
+
+
+        document.getElementById('ads-button').addEventListener('click', async (e) => {
+            e.stopPropagation();
+
+            // @ts-ignore
+            await tgames.showRewardedAd();
+            this.newLiveBlock();
         });
 
         document.addEventListener('touchstart', e => {
@@ -350,6 +388,7 @@ class Game {
 
     restartGame() {
         this.updateState(this.STATES.RESETTING);
+        this.spareLife = true;
 
         // give message to our class
         // @ts-ignore
@@ -431,17 +470,61 @@ class Game {
         }
     }
 
+    newLiveBlock() {
+        let currentBlock = this.blocks[this.blocks.length - 2];
+        let newBlocks: BlockReturn = currentBlock.place();
+
+        this.newBlocks.remove(currentBlock.mesh);
+
+        if ( newBlocks.placed ) {
+            this.placedBlocks.add(newBlocks.placed);
+        }
+
+        this.scoreContainer.innerHTML = String(this.blocks.length - 1);
+
+        let newKidOnTheBlock = new Block(currentBlock, true);
+        this.newBlocks.add(newKidOnTheBlock.mesh);
+        this.blocks.push(newKidOnTheBlock);
+
+        this.stage.setCamera(this.blocks.length * 2);
+
+        this.updateState(this.STATES.PLAYING);
+    }
+
     endGame() {
         let gameScore = { value: this.blocks.length - 2 };
-
-        // Show our Ad when game over
-        // @ts-ignore
-        tgames.gameOver( gameScore.value );
         // Tell our class that game is over
         // @ts-ignore
-        tgames.showRewardedAd();
+        tgames.gameOver( gameScore.value );
+        this.adsCounter--;
+
+        if ( this.spareLife ) {
+            // @ts-ignore
+            document.querySelector('.background-blur').style.display = 'block';
+            // @ts-ignore
+            document.querySelector('.game-watch-ads').style.display = 'flex';
+
+            this.adsTimeout = setTimeout(() => {
+                this.handleSkipWatchAds();
+            }, 8000);
+        }
+
+        if ( this.adsCounter === 0 || this.adsCounter < 0 ) {
+            // @ts-ignore
+            tgames.showRewardedAd();
+            this.adsCounter = 3;
+        }
 
         this.updateState(this.STATES.ENDED);
+    }
+
+    handleSkipWatchAds() {
+        // @ts-ignore
+        document.querySelector('.background-blur').style.display = 'none';
+        // @ts-ignore
+        document.querySelector('.game-watch-ads').style.display = 'none';
+
+        this.spareLife = false;
     }
 
     tick() {
@@ -452,3 +535,4 @@ class Game {
 }
 
 let game = new Game();
+
