@@ -175,7 +175,7 @@ class Block {
         let geometry = new THREE.BoxGeometry( this.dimension.width, this.dimension.height, this.dimension.depth );
         geometry.applyMatrix4( new THREE.Matrix4().makeTranslation( this.dimension.width / 2, this.dimension.height / 2, this.dimension.depth / 2 ) );
         // @ts-ignore
-        this.material = new THREE.MeshToonMaterial( { color: this.color, shading: THREE.FlatShading} );
+        this.material = new THREE.MeshToonMaterial( { color: this.color } );
         this.mesh = new THREE.Mesh( geometry, this.material );
         this.mesh.position.set( this.position.x, this.position.y + (this.state == this.STATES.ACTIVE ? 0 : 0), this.position.z );
 
@@ -289,6 +289,7 @@ class Game {
     spareLife: boolean;
     adsCounter: any;
     adsTimeout: any;
+    score: number;
 
     constructor() {
         this.stage = new Stage();
@@ -300,6 +301,7 @@ class Game {
         this.scoreContainer.innerHTML = '0';
         this.spareLife = true;
         this.adsCounter = 3;
+        this.score = this.getScoreFromLS();
 
         this.newBlocks = new THREE.Group();
         this.placedBlocks = new THREE.Group();
@@ -338,12 +340,25 @@ class Game {
             e.stopPropagation();
 
             // @ts-ignore
-            await tgames.showRewardedAd();
+            // await tgames.showRewardedAd("default", '10', 4)
+            //     .then(() => {
+            //         this.newLiveBlock();
+            //     });
+
+            // @ts-ignore
+            document.querySelector('.background-blur').style.display = 'none';
+            // @ts-ignore
+            document.querySelector('.game-watch-ads').style.display = 'none';
+
+            clearTimeout(this.adsTimeout);
+            this.adsCounter = 3;
             this.newLiveBlock();
+
+            this.spareLife = false;
         });
 
         document.addEventListener('touchstart', e => {
-            e.preventDefault();
+            // e.preventDefault();
             // this.onAction();
 
             // ☝️ this triggers after click on android so you
@@ -486,9 +501,46 @@ class Game {
         this.newBlocks.add(newKidOnTheBlock.mesh);
         this.blocks.push(newKidOnTheBlock);
 
+        let score = this.blocks.length - 1;
+
+        if ( score > this.score ) {
+            this.score = score;
+            this.setScoreToLS(String(score));
+
+            // @ts-ignore
+            tgames.setScore(this.score);
+        }
+
         this.stage.setCamera(this.blocks.length * 2);
 
         this.updateState(this.STATES.PLAYING);
+    }
+
+    getScoreFromLS() {
+        try {
+            let score = window.localStorage.getItem('score');
+
+            if (!score) {
+                this.setScoreToLS('0');
+
+                return 0;
+            }
+
+            return Number(score);
+        } catch (e) {
+            console.log(e);
+        }
+        return 0;
+    }
+
+    setScoreToLS(score: string) {
+        try {
+            if (Number(score) > this.score) {
+                window.localStorage.setItem('score', score);
+            }
+        } catch (e) {
+            console.log(e)
+        }
     }
 
     endGame() {
@@ -507,11 +559,9 @@ class Game {
             this.adsTimeout = setTimeout(() => {
                 this.handleSkipWatchAds();
             }, 8000);
-        }
-
-        if ( this.adsCounter === 0 || this.adsCounter < 0 ) {
+        } else if ( this.adsCounter === 0 || this.adsCounter < 0 ) {
             // @ts-ignore
-            tgames.showRewardedAd();
+            tgames.showRewardedAd("default", '5', 4);
             this.adsCounter = 3;
         }
 
