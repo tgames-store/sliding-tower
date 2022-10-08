@@ -340,10 +340,12 @@ class Game {
             e.stopPropagation();
 
             // @ts-ignore
-            // await tgames.showRewardedAd("default", '10', 4)
-            //     .then(() => {
-            //         this.newLiveBlock();
-            //     });
+            await tgames.showRewardedAd("default", '10', 4)
+                .then(() => {
+                    this.newLiveBlock();
+                    // @ts-ignore
+                    tgames.gameStarted();
+                });
 
             // @ts-ignore
             document.querySelector('.background-blur').style.display = 'none';
@@ -352,7 +354,6 @@ class Game {
 
             clearTimeout(this.adsTimeout);
             this.adsCounter = 3;
-            this.newLiveBlock();
 
             this.spareLife = false;
         });
