@@ -1,6 +1,7 @@
 import './style.scss'
 // @ts-ignore
 import * as THREE from 'three'
+// @ts-ignore
 import { TweenLite, Power1 } from "gsap";
 console.clear();
 
