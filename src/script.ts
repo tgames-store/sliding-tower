@@ -355,7 +355,6 @@ class Game {
 
             clearTimeout(this.adsTimeout);
             this.adsCounter = 3;
-
             this.spareLife = false;
         });
 
